@@ -6,7 +6,10 @@ import org.e2e.labe2e02.driver.domain.Driver;
 import org.e2e.labe2e02.user.infrastructure.BaseUserRepository;
 
 import java.util.List;
+import java.util.Optional;
+
 
 public interface DriverRepository extends BaseUserRepository<Driver> {
     List<Driver> findAllByCategory(Category category);
+    Optional<Driver> getDriverById(Long id);
 }
