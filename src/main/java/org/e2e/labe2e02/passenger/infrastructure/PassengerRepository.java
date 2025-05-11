@@ -6,4 +6,6 @@ import org.e2e.labe2e02.user.infrastructure.BaseUserRepository;
 
 @Transactional
 public interface PassengerRepository extends BaseUserRepository<Passenger> {
+
+
 }

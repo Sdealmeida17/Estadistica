@@ -70,7 +70,7 @@ public class PassengerService {
         Passenger passenger = new Passenger();
         passenger.setFirstName(dto.getFirstName());
         passenger.setLastName(dto.getLastName());
-        passenger.setPhoneNummber(dto.getPhoneNummber());
+        passenger.setPhoneNumber(dto.getPhoneNummber());
         passenger.setEmail(dto.getEmail());
         passenger.setPassword(dto.getPassword());
         passenger.setRole(dto.getRole());
