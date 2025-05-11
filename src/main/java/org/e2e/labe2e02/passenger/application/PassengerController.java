@@ -1,12 +1,12 @@
 package org.e2e.labe2e02.passenger.application;
 
 import lombok.RequiredArgsConstructor;
-import org.e2e.labe2e02.passenger.domain.Passenger;
 import org.e2e.labe2e02.passenger.domain.PassengerService;
 import org.e2e.labe2e02.passenger.dto.PassengerLocationDto;
 import org.e2e.labe2e02.passenger.dto.PassengerRequestDto;
 import org.e2e.labe2e02.passenger.dto.PassengerResponseDto;
-import org.modelmapper.ModelMapper;
+import org.e2e.labe2e02.passenger.exception.PassengerNotFoundException;
+import org.e2e.labe2e02.passenger.dto.PassengerMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,31 +18,51 @@ import java.util.List;
 @RequestMapping("/passenger")
 @RequiredArgsConstructor
 public class PassengerController {
-    private final PassengerService passengerService;
 
-    private final ModelMapper modelMapper;
+    private final PassengerService passengerService;
+    private final PassengerMapper passengerMapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<> getPassengerById() {
+    public ResponseEntity<PassengerResponseDto> getPassengerById(@PathVariable Long id) {
+        return passengerService.getPassengerById(id)
+                .map(passengerMapper::toResponseDto)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new PassengerNotFoundException(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<> deletePassengerById() {
+    public ResponseEntity<Void> deletePassengerById(@PathVariable Long id) {
+        passengerService.deletePassengerById(id);
+        return ResponseEntity.noContent().build(); // 204
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<> addPassengerPlace() {
+    public ResponseEntity<PassengerResponseDto> addPassengerPlace(@PathVariable Long id,
+                                                                  @RequestBody PassengerLocationDto locationDto) {
+        var updatedPassenger = passengerService.addPlace(id, locationDto);
+        return ResponseEntity.ok(passengerMapper.toResponseDto(updatedPassenger));
     }
 
     @GetMapping("/{id}/places")
-    public ResponseEntity<> getPassengerPlacesById() {
+    public ResponseEntity<List<PassengerLocationDto>> getPassengerPlacesById(@PathVariable Long id) {
+        return ResponseEntity.ok(passengerService.getPassengerPlaces(id));
     }
 
     @DeleteMapping("/{id}/places/{coordinateId}")
-    public ResponseEntity<> deletePassengerPlace() {
+    public ResponseEntity<Void> deletePassengerPlace(@PathVariable Long id, @PathVariable Long coordinateId) {
+        passengerService.deletePassengerPlace(id, coordinateId);
+        return ResponseEntity.noContent().build(); // 204
     }
 
     @PostMapping
-    public ResponseEntity<> createPassenger() {
+    public ResponseEntity<PassengerResponseDto> createPassenger(@RequestBody PassengerRequestDto requestDto) {
+        var createdPassenger = passengerService.createPassenger(requestDto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdPassenger.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(passengerMapper.toResponseDto(createdPassenger)); // 201
     }
 }
