@@ -11,4 +11,11 @@ public class PassengerLocationDto {
     private Long id;
     private Double latitude;
     private Double longitude;
+    private String description;
+
+    public PassengerLocationDto(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.description = description;
+    }
 }

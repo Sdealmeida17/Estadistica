@@ -1,6 +1,8 @@
 package org.e2e.labe2e02.passenger.application;
 
 import lombok.RequiredArgsConstructor;
+import org.e2e.labe2e02.coordinate.domain.Coordinate;
+import org.e2e.labe2e02.passenger.domain.Passenger;
 import org.e2e.labe2e02.passenger.domain.PassengerService;
 import org.e2e.labe2e02.passenger.dto.PassengerLocationDto;
 import org.e2e.labe2e02.passenger.dto.PassengerRequestDto;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/passenger")
@@ -24,10 +27,9 @@ public class PassengerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PassengerResponseDto> getPassengerById(@PathVariable Long id) {
-        return passengerService.getPassengerById(id)
-                .map(passengerMapper::toResponseDto)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new PassengerNotFoundException(id));
+        Passenger passenger = passengerService.getPassengerById(id);
+        return ResponseEntity.ok(passengerMapper.toResponseDto(passenger));
+
     }
 
     @DeleteMapping("/{id}")
@@ -39,13 +41,18 @@ public class PassengerController {
     @PatchMapping("/{id}")
     public ResponseEntity<PassengerResponseDto> addPassengerPlace(@PathVariable Long id,
                                                                   @RequestBody PassengerLocationDto locationDto) {
-        var updatedPassenger = passengerService.addPlace(id, locationDto);
+        var updatedPassenger = passengerService.addPassengerPlace(id, locationDto);
         return ResponseEntity.ok(passengerMapper.toResponseDto(updatedPassenger));
     }
 
     @GetMapping("/{id}/places")
     public ResponseEntity<List<PassengerLocationDto>> getPassengerPlacesById(@PathVariable Long id) {
-        return ResponseEntity.ok(passengerService.getPassengerPlaces(id));
+        List<Coordinate> coordinates = passengerService.getPassengerPlacesById(id);
+        // Mapear la lista de coordenadas a DTO.
+        List<PassengerLocationDto> locationDtos = coordinates.stream()
+                .map(coordinate -> new PassengerLocationDto(coordinate.getLatitude(), coordinate.getLongitude()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(locationDtos);
     }
 
     @DeleteMapping("/{id}/places/{coordinateId}")

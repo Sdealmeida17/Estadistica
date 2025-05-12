@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @NoArgsConstructor
-public class Coordinate {
+public class Coordinate extends UserLocation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,4 +36,6 @@ public class Coordinate {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+
 }

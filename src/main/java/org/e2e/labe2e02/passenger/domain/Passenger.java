@@ -30,10 +30,14 @@ public class Passenger extends User {
             orphanRemoval = true,
             fetch = FetchType.EAGER
     )
+
+
     private List<UserLocation> places = new ArrayList<>();
 
     @OneToMany(mappedBy = "passenger")
     private List<Ride> rides = new ArrayList<>();
+
+
 
     public List<Coordinate> getPlacesList() {
         List<Coordinate> coordinates = new ArrayList<>();
