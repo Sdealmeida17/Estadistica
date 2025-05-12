@@ -10,9 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/ride")
@@ -21,18 +18,30 @@ public class RideController {
     private final RideService rideService;
 
     @PostMapping
-    public ResponseEntity<> createRide() {
+    public ResponseEntity<Ride> createRide(@RequestBody RideRequestDto rideRequestDto) {
+        Ride createdRide = rideService.createRide(rideRequestDto);
+        return ResponseEntity.status(201).body(createdRide);
     }
 
     @PatchMapping("/{rideId}/assign/{driverId}")
-    public ResponseEntity<> assignDriverToRide() {
+    public ResponseEntity<Ride> assignDriverToRide(@PathVariable Long rideId, @PathVariable Long driverId) {
+        Ride assignedRide = rideService.assignDriverToRide(rideId, driverId);
+        return ResponseEntity.ok(assignedRide);
     }
 
     @GetMapping("/{passengerId}")
-    public ResponseEntity<Page<>> getRidesByPassengerId() {
+    public ResponseEntity<Page<RideResponseDto>> getRidesByPassengerId(
+            @PathVariable Long passengerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<RideResponseDto> rides = rideService.getPassengerRides(passengerId, pageRequest);
+        return ResponseEntity.ok(rides);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<> cancelRide() {
+    public ResponseEntity<Ride> cancelRide(@PathVariable Long id) {
+        Ride canceledRide = rideService.cancelRide(id);
+        return ResponseEntity.ok(canceledRide);
     }
 }
